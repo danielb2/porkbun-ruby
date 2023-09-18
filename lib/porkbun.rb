@@ -5,13 +5,11 @@ require_relative 'porkbun/version'
 
 module Porkbun
   class Error < StandardError; end
-  SECRET_KEY = nil
-  API_KEY = nil
 
   def self.porkbun(path, options = {})
     res = HTTP.post File.join('https://porkbun.com/api/json/v3', path), json: {
-      secretapikey: SECRET_KEY || ENV.fetch('PORKBUN_SECRET_KEY', nil),
-      apikey: API_KEY || ENV.fetch('PORKBUN_API_KEY', nil)
+      secretapikey: ENV.fetch('PORKBUN_SECRET_API_KEY', nil),
+      apikey: ENV.fetch('PORKBUN_API_KEY', nil)
     }.merge(options)
 
     res.parse
