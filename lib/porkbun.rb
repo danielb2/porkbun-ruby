@@ -15,6 +15,19 @@ module Porkbun
     res.parse
   end
 
+  class Abstract
+    attr_accessor :message, :status
+
+    def succes?
+      @status == 'SUCCESS'
+    end
+
+    def parse_response(res)
+      @message = res['message']
+      @status = res['status']
+    end
+  end
+
   class Domain
     def self.list_all
       Porkbun.porkbun('domain/listAll')
@@ -25,8 +38,8 @@ module Porkbun
     porkbun 'ping'
   end
 
-  class DNS
-    attr_accessor :name, :content, :type, :ttl, :prio, :domain
+  class DNS < Abstract
+    attr_accessor :name, :content, :type, :ttl, :prio, :domain, :id
 
     def initialize(options)
       @name = options[:name]
@@ -54,8 +67,9 @@ module Porkbun
         type:,
         ttl:
       }
+      parse_response res
       @id = res['id']
-      res
+      self
     end
   end
 end

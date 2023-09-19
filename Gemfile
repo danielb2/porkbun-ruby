@@ -10,3 +10,5 @@ gem "rake", "~> 13.0"
 gem "rspec", "~> 3.12", :group => :test
 
 gem "webmock", "~> 3.19", :group => :test
+
+gem "pry", "~> 0.14.2", :group => :test

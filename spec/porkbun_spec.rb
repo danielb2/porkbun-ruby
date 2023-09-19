@@ -69,8 +69,9 @@ describe Porkbun do
                      'Content-Type' => 'application/json'
                    })
 
-      expect(Porkbun::DNS.create(name: 'www', content: '1.1.1.1', domain: 'onepiece.com',
-                                 type: 'A')).to eq(response_body)
+      record = Porkbun::DNS.create(name: 'www', content: '1.1.1.1', domain: 'onepiece.com',
+                                   type: 'A')
+      expect(record.id).to eq('106926659')
     end
   end
 end
