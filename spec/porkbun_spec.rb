@@ -48,33 +48,29 @@ describe Porkbun do
   end
   context Porkbun::DNS do
     it 'should create' do
-      body = {
-        secretapikey: 'YOUR_SECRET_API_KEY',
-        apikey: 'YOUR_API_KEY',
-        name: 'www',
-        type: 'A',
-        content: '1.1.1.1',
-        ttl: '600'
-      }.to_json
+      request_body =
+        { 'secretapikey' => 'YOUR_SECRET_API_KEY',
+          'apikey' => 'YOUR_API_KEY',
+          'name' => 'www',
+          'content' => '1.1.1.1',
+          'type' => 'A',
+          'ttl' => 600 }
 
-      response = {
-        "status": 'SUCCESS',
-        "id": '106926659'
-      }.to_json
+      response_body = {
+        'status' => 'SUCCESS',
+        'id' => '106926659'
+      }
 
-      stub_request(:post, 'http://example.com/api/endpoint')
-        .with(body:)
-        .to_return(status: 200, body: {
-          "status": 'SUCCESS',
-          "id": '106926659'
-        }.to_json)
-
-      stub_request(:post, 'https://porkbun.com/api/json/v3/dns/create')
-        .with(body:)
-        .to_return(status: 200, body: response, headers: {
+      stub_request(:post, 'https://porkbun.com/api/json/v3/dns/create/onepiece.com')
+        .with(
+          body: request_body.to_json
+        )
+        .to_return(status: 200, body: response_body.to_json, headers: {
                      'Content-Type' => 'application/json'
                    })
-      expect(Porkbun::DNS.create(name: 'test', content: 'test')).to eq(response)
+
+      expect(Porkbun::DNS.create(name: 'www', content: '1.1.1.1', domain: 'onepiece.com',
+                                 type: 'A')).to eq(response_body)
     end
   end
 end

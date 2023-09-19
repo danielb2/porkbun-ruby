@@ -26,14 +26,15 @@ module Porkbun
   end
 
   class DNS
-    attr_accessor :name, :content, :type, :ttl, :prio, :service, :protocol, :port, :weight, :target
+    attr_accessor :name, :content, :type, :ttl, :prio, :domain
 
     def initialize(options)
       @name = options[:name]
       @content = options[:content]
       @type = options[:type]
-      @ttl = options[:ttl]
+      @ttl = options[:ttl] || 600
       @prio = options[:prio]
+      @domain = options[:domain]
       @id = options[:id]
     end
 
@@ -46,10 +47,13 @@ module Porkbun
       raise Error, 'need id to edit' unless @id
     end
 
-    def create(options)
-      res = Porkbun.porkbun 'dns/create', {
-        ttl: @ttl
-      }.merge(options)
+    def create
+      res = Porkbun.porkbun File.join('dns/create', domain), {
+        name:,
+        content:,
+        type:,
+        ttl:
+      }
       @id = res['id']
       res
     end
