@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+
+require 'bundler/setup'
+require 'porkbun'
+require 'thor'
+
+class CLI < Thor
+  desc 'import <file>', 'Import BIND zone file'
+  def import(file)
+    record_regex = /^(?<hostname>[^\s]+)\.\s+(?<ttl>\d+)\s+IN\s+(?<type>[^\s]+)\s*(?<priority>\d+)?\s+(?<content>[^\s]+)$/
+    IO.readlines(file).each do |line|
+      match_data = line.match(record_regex)
+      next unless match_data
+
+      domain = match_data[:hostname].split('.')[-2..].join('.').chomp '.'
+      name = match_data[:hostname].split('.')[0..-3].join('.')
+
+      options = {
+        domain:,
+        name:,
+        ttl: match_data[:ttl],
+        type: match_data[:type],
+        prio: match_data[:priority],
+        content: match_data[:content].chomp('.').gsub(/^"|"$/, '')
+      }.compact
+
+      record = Porkbun::DNS.create options
+      pp record
+    end
+  end
+end
+
+CLI.start(ARGV)
