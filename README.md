@@ -11,7 +11,7 @@ Reference: https://porkbun.com/api/json/v3/documentation
 ```ruby
 Porkbun.API_KEY = 'YOUR_API_KEY'
 Porkbun.SECRET_KEY = 'YOUR_SECRET_KEY'
-record = Porkbun::Record.create(name: 'test',
+record = Porkbun::DNS.create(name: 'test',
 type: 'A',
 content: '1.1.1.1',
 ttl: 300
