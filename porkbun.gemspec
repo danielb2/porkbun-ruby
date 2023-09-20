@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
 
   spec.summary = 'Porkbun API wrapper for Ruby.'
   spec.description = 'Porkbun API wrapper for Ruby.'
-  spec.homepage = 'https://github.com/danielb2/porkbun'
+  spec.homepage = 'https://github.com/danielb2/porkbun-ruby'
   spec.required_ruby_version = '>= 2.6.0'
 
   # spec.metadata['allowed_push_host'] = "TODO: Set to your gem server 'https://example.com'"
