@@ -7,7 +7,6 @@ module Porkbun
   class Error < StandardError; end
 
   def self.porkbun(path, options = {})
-    pp path
     res = HTTP.post File.join('https://porkbun.com/api/json/v3', path), json: {
       secretapikey: ENV.fetch('PORKBUN_SECRET_API_KEY', nil),
       apikey: ENV.fetch('PORKBUN_API_KEY', nil)

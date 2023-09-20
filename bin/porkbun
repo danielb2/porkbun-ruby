@@ -28,6 +28,13 @@ class CLI < Thor
       pp record
     end
   end
+
+  desc 'list', 'List all domains'
+  def list
+    Porkbun::Domain.list_all[:domains].each do |domain|
+      puts domain.to_json
+    end
+  end
 end
 
 CLI.start(ARGV)
