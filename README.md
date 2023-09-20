@@ -10,7 +10,7 @@ Reference: https://porkbun.com/api/json/v3/documentation
 
 ```ruby
 Porkbun.API_KEY = 'YOUR_API_KEY'
-Porkbun.SECRET_KEY = 'YOUR_SECRET_KEY'
+Porkbun.SECRET_API_KEY = 'YOUR_SECRET_API_KEY'
 record = Porkbun::DNS.create(name: 'test',
 type: 'A',
 content: '1.1.1.1',
