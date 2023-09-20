@@ -7,24 +7,25 @@ module Porkbun
   class Error < StandardError; end
 
   def self.porkbun(path, options = {})
+    pp path
     res = HTTP.post File.join('https://porkbun.com/api/json/v3', path), json: {
       secretapikey: ENV.fetch('PORKBUN_SECRET_API_KEY', nil),
       apikey: ENV.fetch('PORKBUN_API_KEY', nil)
     }.merge(options)
 
-    res.parse
+    JSON.parse(res.body, symbolize_names: true)
   end
 
   class Abstract
     attr_accessor :message, :status
 
-    def succes?
+    def success?
       @status == 'SUCCESS'
     end
 
     def parse_response(res)
-      @message = res['message']
-      @status = res['status']
+      @message = res[:message]
+      @status = res[:status]
     end
   end
 
@@ -39,7 +40,7 @@ module Porkbun
   end
 
   class DNS < Abstract
-    attr_accessor :name, :content, :type, :ttl, :prio, :domain, :id
+    attr_accessor :name, :content, :type, :ttl, :prio, :domain, :id, :notes
 
     def initialize(options)
       @name = options[:name]
@@ -60,6 +61,23 @@ module Porkbun
       raise Error, 'need id to edit' unless @id
     end
 
+    def self.retrieve(domain, id = nil)
+      raise Error, 'need domain' unless domain
+
+      res = Porkbun.porkbun File.join('dns/retrieve', domain, id || '').chomp('/')
+      res[:records].map do |record|
+        DNS.new record.merge(domain:)
+      end
+    end
+
+    def delete
+      raise Error, 'Need ID to delete record' unless id
+
+      res = Porkbun.porkbun File.join('dns/delete', domain, id)
+      parse_response res
+      self
+    end
+
     def create
       res = Porkbun.porkbun File.join('dns/create', domain), {
         name:,
@@ -68,7 +86,7 @@ module Porkbun
         ttl:
       }
       parse_response res
-      @id = res['id']
+      @id = res[:id]
       self
     end
   end

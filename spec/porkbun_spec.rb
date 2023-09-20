@@ -5,7 +5,7 @@ ENV.store 'PORKBUN_SECRET_API_KEY', 'YOUR_SECRET_API_KEY'
 describe Porkbun do
   context 'ping' do
     it 'should ping' do
-      body = { 'status' => 'SUCCESS', 'yourIp' => '171.226.155.160' }
+      body = { status: 'SUCCESS', yourIp: '171.226.155.160' }
       stub_request(:post, 'https://porkbun.com/api/json/v3/ping')
         .with(body: {
                 "secretapikey": 'YOUR_SECRET_API_KEY',
@@ -19,22 +19,19 @@ describe Porkbun do
   end
   context Porkbun::Domain do
     it 'should list all' do
-      body = {
-        'status' => 'SUCCESS',
-        'domains' => [
-          {
-            'domain' => 'borseth.ink',
-            'status' => 'ACTIVE',
-            'tld' => 'app',
-            'createDate' => '2018-08-20 17:52:51',
-            'expireDate' => '2023-08-20 17:52:51',
-            'securityLock' => '1',
-            'whoisPrivacy' => '1',
-            'autoRenew' => 0,
-            'notLocal' => 0
-          }
-        ]
-      }
+      body = { status: 'SUCCESS',
+               domains: [
+                 { domain: 'borseth.ink',
+                   status: 'ACTIVE',
+                   tld: 'app',
+                   createDate: '2018-08-20 17:52:51',
+                   expireDate: '2023-08-20 17:52:51',
+                   securityLock: '1',
+                   whoisPrivacy: '1',
+                   autoRenew: 0,
+                   notLocal: 0 }
+               ] }
+
       stub_request(:post, 'https://porkbun.com/api/json/v3/domain/listAll')
         .with(body: {
                 "secretapikey": 'YOUR_SECRET_API_KEY',

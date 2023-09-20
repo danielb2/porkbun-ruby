@@ -11,7 +11,7 @@ def parse_zone_file(file)
     next unless match_data
 
     domain = match_data[:hostname].split('.')[-2..].join('.').chomp '.'
-    name = match_data[:hostname].split('.')[-3]
+    name = match_data[:hostname].split('.')[0..-3].join('.')
 
     options = {
       domain:,
@@ -19,9 +19,8 @@ def parse_zone_file(file)
       ttl: match_data[:ttl],
       type: match_data[:type],
       prio: match_data[:priority],
-      content: match_data[:content].chomp('.')
+      content: match_data[:content].chomp('.').gsub(/^"|"$/, '')
     }.compact
-    next if match_data[:type] == 'MX'
 
     record = Porkbun::DNS.create options
     pp record
