@@ -2,6 +2,9 @@
 
 Reference: https://porkbun.com/api/json/v3/documentation
 
+This is currently only a partial implementation to suit my own needs. If you
+need a specific call to be implemented, let me know, or submit a PR
+
 ## Installation
 
 `gem install porkbun`
