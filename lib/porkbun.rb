@@ -64,6 +64,8 @@ module Porkbun
       raise Error, 'need domain' unless domain
 
       res = Porkbun.porkbun File.join('dns/retrieve', domain, id || '').chomp('/')
+      return Error.new(res[:message]) if res[:status] == 'ERROR'
+
       res[:records].map do |record|
         DNS.new record.merge(domain:)
       end
@@ -77,13 +79,30 @@ module Porkbun
       self
     end
 
+    require 'pry'
+    def to_s
+      content_str = case type
+                    when /TXT|SPF/
+                      "\"#{content}\""
+                    when /MX|CNAME|NS/
+                      "#{content}."
+                    else
+                      String(content)
+                    end
+
+      prio_str = prio == '0' ? '' : prio
+      "#{name}. #{ttl} IN #{type} #{prio_str} #{content_str}".tr_s(' ', ' ')
+    end
+
     def create
-      res = Porkbun.porkbun File.join('dns/create', domain), {
+      options = {
         name:,
         content:,
         type:,
         ttl:
       }
+      options.merge!(prio:) if prio
+      res = Porkbun.porkbun File.join('dns/create', domain), options
       parse_response res
       @id = res[:id]
       self

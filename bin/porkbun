@@ -7,7 +7,7 @@ require 'thor'
 class CLI < Thor
   desc 'import <file>', 'Import BIND zone file'
   def import(file)
-    record_regex = /^(?<hostname>[^\s]+)\.\s+(?<ttl>\d+)\s+IN\s+(?<type>[^\s]+)\s*(?<priority>\d+)?\s+(?<content>[^\s]+)$/
+    record_regex = /^(?<hostname>[^\s]+)\.\s+(?<ttl>\d+)\s+IN\s+(?<type>[^\s]+)\s*(?<priority>\d+)?\s+(?<content>.+)$/
     IO.readlines(file).each do |line|
       match_data = line.match(record_regex)
       next unless match_data
@@ -32,8 +32,40 @@ class CLI < Thor
   desc 'list', 'List all domains'
   def list
     Porkbun::Domain.list_all[:domains].each do |domain|
-      puts domain.to_json
+      puts domain[:domain]
     end
+  end
+
+  desc 'delete_all <domain>', 'deletes all records for a domain. this is destructive. use with caution'
+  def delete_all(domain, id = '')
+    records = get_all(domain, id)
+    records.each do |record|
+      next if record.type == 'NS'
+
+      puts "DELETE #{record}"
+      record.delete
+    end
+  end
+
+  desc 'retrieve <domain> [<id>]', 'List all records for a domain'
+  def retrieve(domain, id = '')
+    records = get_all(domain, id)
+    puts records
+  end
+
+  def self.exit_on_failure?
+    exit 1
+  end
+
+  private
+
+  def get_all(domain, id = '')
+    records = Porkbun::DNS.retrieve(domain, id)
+    if records.instance_of?(Porkbun::Error)
+      puts records.message
+      exit 1
+    end
+    records
   end
 end
 
