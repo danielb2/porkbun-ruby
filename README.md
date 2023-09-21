@@ -9,14 +9,49 @@ Reference: https://porkbun.com/api/json/v3/documentation
 ## Usage
 
 ```ruby
-Porkbun.API_KEY = 'YOUR_API_KEY'
-Porkbun.SECRET_API_KEY = 'YOUR_SECRET_API_KEY'
+ENV['PORKBUN_API_KEY'] = 'YOUR_API_KEY'
+ENV['PORKBUN_SECRET_API_KEY'] = 'YOUR_SECRET_API_KEY'
 record = Porkbun::DNS.create(name: 'test',
-type: 'A',
-content: '1.1.1.1',
-ttl: 300
+  type: 'A',
+  content: '1.1.1.1',
+  ttl: 300
 )
 ```
+
+## API
+
+### `Porkbun::Domain.ping`
+
+Make sure your keys are good.
+
+### `Porkbun::DNS.retrieve(domain, id)`
+
+Retrive all or specific record for a domain
+
+### `Porkbun::DNS.create(options)`
+
+Create record for a domain
+
+options:
+- `name` - name of record. example `www`
+- `type` - record type. example: CNAME
+- `content` - content of record. example '1.1.1.1',
+- `ttl` - time to live. example: 600. porkbun seems to have this as a minimum
+- `prio` - record priority. mainly for MX records. example 10.
+
+returns instance of DNS which can be used to delete
+
+## CLI
+
+The gem also comes with a CLI
+
+    $ porkbun
+    Commands:
+      porkbun delete_all <domain>       # deletes all records for a domain. this is destructive. use with caution
+      porkbun help [COMMAND]            # Describe available commands or one specific command
+      porkbun import <file>             # Import BIND zone file
+      porkbun list                      # List all domains
+      porkbun retrieve <domain> [<id>]  # List all records for a domain
 
 ## Development
 
