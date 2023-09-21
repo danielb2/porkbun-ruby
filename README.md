@@ -23,7 +23,7 @@ record = Porkbun::DNS.create(name: 'test',
 
 ## API
 
-### `Porkbun::Domain.ping`
+### `Porkbun.ping`
 
 Make sure your keys are good.
 
