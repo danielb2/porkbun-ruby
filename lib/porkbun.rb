@@ -79,7 +79,6 @@ module Porkbun
       self
     end
 
-    require 'pry'
     def to_s
       content_str = case type
                     when /TXT|SPF/
