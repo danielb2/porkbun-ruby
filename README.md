@@ -58,6 +58,10 @@ The gem also comes with a CLI
       porkbun retrieve <domain> [<id>]         # List all records for a domain
 
 
+be sure to set the environmental variables for it to work
+
+export PORKBUN_API_KEY = YOUR_API_KEY
+export PORKBUN_SECRET_API_KEY = YOUR_SECRET_API_KEY
 
 ## Development
 
