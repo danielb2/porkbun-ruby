@@ -57,7 +57,16 @@ module Porkbun
     end
 
     def edit
-      raise Error, 'need id to edit' unless @id
+      raise Error, 'Need ID to id record' unless id
+
+      res = Porkbun.porkbun File.join('dns/edit', domain, id), get_options
+      parse_response res
+      @id = res[:id]
+      self
+    end
+
+    def save
+      edit
     end
 
     def self.retrieve(domain, id = nil)
@@ -94,17 +103,23 @@ module Porkbun
     end
 
     def create
+      res = Porkbun.porkbun File.join('dns/create', domain), get_options
+      parse_response res
+      @id = res[:id]
+      self
+    end
+
+    private
+
+    def get_options
       options = {
         name:,
         content:,
         type:,
         ttl:
       }
-      options.merge!(prio:) if prio
-      res = Porkbun.porkbun File.join('dns/create', domain), options
-      parse_response res
-      @id = res[:id]
-      self
+      options.merge!(prio:) if prio and prio != '0'
+      options
     end
   end
 end

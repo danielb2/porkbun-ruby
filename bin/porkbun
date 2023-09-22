@@ -47,6 +47,27 @@ class CLI < Thor
     end
   end
 
+  desc 'dyndns <hostname.domain> [<ip>]', 'Update a dynamic dns record. example: porkbun dyndns home.example.com'
+  def dyndns(hostname, ip = nil)
+    ip ||= HTTP.get('https://canhazip.com').to_s.chomp
+    domain = hostname.split('.')[-2..].join('.').chomp '.'
+    name = hostname.split('.')[0..-3].join('.')
+    records = get_all(domain)
+    record = records.find { |r| r.name == hostname }
+    if record
+      record.content = ip
+      record.name = name
+      puts "UPDATE #{record}"
+      record.save
+      puts record.message
+    else
+      print "CREATE "
+      record = Porkbun::DNS.create(domain:, name:, type: 'A', content: ip)
+      puts record
+      puts record.message
+    end
+  end
+
   desc 'retrieve <domain> [<id>]', 'List all records for a domain'
   def retrieve(domain, id = '')
     records = get_all(domain, id)
