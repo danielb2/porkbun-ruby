@@ -48,6 +48,7 @@ class CLI < Thor
   end
 
   desc 'dyndns <hostname.domain> [<ip>]', 'Update a dynamic dns record. example: porkbun dyndns home.example.com'
+  long_desc 'If no IP is provided, the current public IP is used.'
   def dyndns(hostname, ip = nil)
     ip ||= HTTP.get('https://canhazip.com').to_s.chomp
     domain = hostname.split('.')[-2..].join('.').chomp '.'
@@ -61,7 +62,7 @@ class CLI < Thor
       record.save
       puts record.message
     else
-      print "CREATE "
+      print 'CREATE '
       record = Porkbun::DNS.create(domain:, name:, type: 'A', content: ip)
       puts record
       puts record.message
