@@ -50,11 +50,14 @@ The gem also comes with a CLI
 
     $ porkbun
     Commands:
-      porkbun delete_all <domain>       # deletes all records for a domain. this is destructive. use with caution
-      porkbun help [COMMAND]            # Describe available commands or one specific command
-      porkbun import <file>             # Import BIND zone file
-      porkbun list                      # List all domains
-      porkbun retrieve <domain> [<id>]  # List all records for a domain
+      porkbun delete_all <domain>              # deletes all records for a domain. this is destructive. use with caution
+      porkbun dyndns <hostname.domain> [<ip>]  # Update a dynamic dns record. example: porkbun dyndns home.example.com
+      porkbun help [COMMAND]                   # Describe available commands or one specific command
+      porkbun import <file>                    # Import BIND zone file
+      porkbun list                             # List all domains
+      porkbun retrieve <domain> [<id>]         # List all records for a domain
+
+
 
 ## Development
 
