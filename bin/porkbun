@@ -36,6 +36,12 @@ class CLI < Thor
     end
   end
 
+  desc 'env', 'Print environment variables'
+  def env
+    puts 'PORKBUN_API_KEY: ' + ENV['PORKBUN_API_KEY'].to_s
+    puts 'BUN_SECRET_API_KEY: ' + ENV['PORKBUN_SECRET_API_KEY'].to_s
+  end
+
   desc 'delete_all <domain>', 'deletes all records for a domain. this is destructive. use with caution'
   def delete_all(domain, id = '')
     records = get_all(domain, id)
