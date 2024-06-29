@@ -102,6 +102,18 @@ module Porkbun
       "#{name}. #{ttl} IN #{type} #{prio_str} #{content_str}".tr_s(' ', ' ')
     end
 
+    def to_h
+      {
+        name: name,
+        content: content,
+        type: type,
+        ttl: ttl,
+        prio: prio,
+        domain: domain,
+        id: id
+      }
+    end
+
     def create
       res = Porkbun.porkbun File.join('dns/create', domain), get_options
       parse_response res
