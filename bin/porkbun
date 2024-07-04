@@ -53,6 +53,19 @@ class CLI < Thor
     end
   end
 
+  desc 'create', 'Create a new record'
+  option :type, required: true, desc: 'The record type: A, AAAA, CNAME, MX, TXT, SRV, NS, SOA'
+  option :domain, required: true, desc: 'The domain name: google.com'
+  option :name, required: true, desc: 'The hostname: www'
+  option :content, required: true, desc: 'The content: hostname, or IP address'
+  option :ttl, default: 600, type: :numeric, desc: 'The TTL in seconds'
+  option :prio, default: 0, type: :numeric, desc: 'The priority for MX records'
+  def create
+    record = Porkbun::DNS.create(options)
+    puts record
+    puts record.message
+  end
+
   desc 'dyndns <hostname.domain> [<ip>]', 'Update a dynamic dns record. example: porkbun dyndns home.example.com'
   long_desc 'If no IP is provided, the current public IP is used.'
   def dyndns(hostname, ip = nil)

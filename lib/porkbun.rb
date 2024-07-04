@@ -7,6 +7,7 @@ module Porkbun
   class Error < StandardError; end
 
   def self.porkbun(path, options = {})
+    pp options
     if ENV.fetch('PORKBUN_API_KEY', nil).nil? || ENV.fetch('PORKBUN_SECRET_API_KEY', nil).nil?
       abort 'PORKBUN_API_KEY and PORKBUN_SECRET_API_KEY must be set'
     end
