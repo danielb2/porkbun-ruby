@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    porkbun (0.5.1)
+    porkbun (1.0.0)
       http (~> 5.2.0)
       thor (~> 1.2)
 
