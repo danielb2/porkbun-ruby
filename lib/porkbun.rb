@@ -10,7 +10,7 @@ module Porkbun
     if ENV.fetch('PORKBUN_API_KEY', nil).nil? || ENV.fetch('PORKBUN_SECRET_API_KEY', nil).nil?
       abort 'PORKBUN_API_KEY and PORKBUN_SECRET_API_KEY must be set'
     end
-    res = HTTP.post File.join('https://porkbun.com/api/json/v3', path), json: {
+    res = HTTP.post File.join('https://api.porkbun.com/api/json/v3', path), json: {
       secretapikey: ENV.fetch('PORKBUN_SECRET_API_KEY', nil),
       apikey: ENV.fetch('PORKBUN_API_KEY', nil)
     }.merge(options)

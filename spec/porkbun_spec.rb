@@ -6,7 +6,7 @@ describe Porkbun do
   context 'ping' do
     it 'should ping' do
       body = { status: 'SUCCESS', yourIp: '171.226.155.160' }
-      stub_request(:post, 'https://porkbun.com/api/json/v3/ping')
+      stub_request(:post, 'https://api.porkbun.com/api/json/v3/ping')
         .with(body: {
                 "secretapikey": 'YOUR_SECRET_API_KEY',
                 "apikey": 'YOUR_API_KEY'
@@ -32,7 +32,7 @@ describe Porkbun do
                    notLocal: 0 }
                ] }
 
-      stub_request(:post, 'https://porkbun.com/api/json/v3/domain/listAll')
+      stub_request(:post, 'https://api.porkbun.com/api/json/v3/domain/listAll')
         .with(body: {
                 "secretapikey": 'YOUR_SECRET_API_KEY',
                 "apikey": 'YOUR_API_KEY'
@@ -58,7 +58,7 @@ describe Porkbun do
         'id' => '106926659'
       }
 
-      stub_request(:post, 'https://porkbun.com/api/json/v3/dns/create/onepiece.com')
+      stub_request(:post, 'https://api.porkbun.com/api/json/v3/dns/create/onepiece.com')
         .with(
           body: request_body.to_json
         )

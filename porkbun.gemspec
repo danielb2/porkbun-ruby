@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   # Uncomment to register a new dependency of your gem
-  spec.add_dependency 'http', '~> 5.1.1'
+  spec.add_dependency 'http', '~> 5.2.0'
   spec.add_dependency 'thor', '~> 1.2'
 
   # For more information and examples about making a new gem, check out our
