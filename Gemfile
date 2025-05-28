@@ -5,11 +5,9 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in porkbun.gemspec
 gemspec
 
-group :development do
-  # gem "rake", "~> 13.0", :group => :test
-  gem 'pry', '~> 0.14.2', group: :test
-  gem 'rspec', '~> 3.12', group: :test
-  gem 'webmock', '~> 3.19', group: :test
+group :development, :test do
+  gem 'rake', '~> 13.0'
+  gem 'pry', '~> 0.14.2'
+  gem 'rspec', '~> 3.12'
+  gem 'webmock', '~> 3.19'
 end
-
-gem 'thor', '~> 1.2'
