@@ -59,6 +59,19 @@ describe CLI do
     expect(a_record).to have_received(:delete)
   end
 
+  it 'deletes all records for a hostname with or without a trailing dot' do
+    record = double(name: 'foo', to_s: 'foo.domain.org A 1.1.1.1')
+    allow(record).to receive(:delete)
+    allow(Porkbun::Domain).to receive(:list_all).and_return(domains: [{ domain: 'domain.org' }])
+    allow(Porkbun::DNS).to receive(:list).with('domain.org', '').and_return([record])
+
+    %w[foo.domain.org foo.domain.org.].each do |hostname|
+      expect { CLI.start(['rm', hostname]) }
+        .to output("DELETE foo.domain.org A 1.1.1.1\n").to_stdout
+    end
+    expect(record).to have_received(:delete).twice
+  end
+
   it 'updates an existing dynamic DNS record' do
     record = double(name: 'home.onepiece.com', content: '1.1.1.1', to_s: 'home.onepiece.com A 2.2.2.2', message: 'updated')
     allow(Porkbun::DNS).to receive(:list).and_return([record])
