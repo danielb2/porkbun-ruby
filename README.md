@@ -51,6 +51,7 @@ The gem also comes with a CLI
     $ porkbun
     Commands:
       porkbun add --content=CONTENT --domain=DOMAIN --name=NAME --type=TYPE     # Add a new record
+      porkbun update RECORD [--content=CONTENT] [--ttl=TTL]                    # Update a record (alias: up)
       porkbun rm_rf DOMAIN                                                      # deletes all records for a domain. this is destructive. use with caution
       porkbun rm RECORD                                                       # Delete one record for a hostname
       porkbun dyndns HOSTNAME [IP]                                              # Update a dynamic dns record. example: porkbun dyndns home.example.com

@@ -6,6 +6,7 @@ require 'thor'
 
 class CLI < Thor
   remove_command :tree
+  map 'up' => 'update'
 
   def self.basename
     'porkbun'
@@ -67,6 +68,28 @@ class CLI < Thor
 
   desc 'rm RECORD', 'Delete one record for a hostname'
   def rm(hostname)
+    record = find_record(hostname)
+    puts "DELETE #{record}"
+    record.delete
+  end
+
+  desc 'update RECORD', 'Update a record'
+  option :content, desc: 'The new record content'
+  option :ttl, type: :numeric, desc: 'The new TTL in seconds'
+  def update(hostname)
+    raise Thor::Error, 'Specify --content or --ttl' unless options[:content] || options[:ttl]
+
+    record = find_record(hostname)
+    record.content = options[:content] if options[:content]
+    record.ttl = options[:ttl] if options[:ttl]
+    puts "UPDATE #{record}"
+    record.save
+    puts record.message
+  end
+
+  no_commands do
+
+  def find_record(hostname)
     fqdn = hostname.chomp('.')
     domain = Porkbun::Domain.list_all[:domains]
       .map { |item| item[:domain] }
@@ -83,9 +106,8 @@ class CLI < Thor
     raise Porkbun::Error, 'No record found for hostname' if records.empty?
     raise Porkbun::Error, 'Multiple records found for hostname' if records.length > 1
 
-    record = records.first
-    puts "DELETE #{record}"
-    record.delete
+    records.first
+  end
   end
 
   desc 'add', 'Add a new record'

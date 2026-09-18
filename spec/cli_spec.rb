@@ -43,6 +43,21 @@ describe CLI do
     expect(Porkbun::DNS).to have_received(:create).with(hash_including(domain: 'onepiece.com'))
   end
 
+  it 'updates record content and TTL' do
+    record = double(name: 'foo', content: '1.1.1.1', ttl: 600, to_s: 'foo.domain.org A 2.2.2.2', message: 'updated')
+    allow(record).to receive(:content=)
+    allow(record).to receive(:ttl=)
+    allow(record).to receive(:save)
+    allow(Porkbun::Domain).to receive(:list_all).and_return(domains: [{ domain: 'domain.org' }])
+    allow(Porkbun::DNS).to receive(:list).with('domain.org', '').and_return([record])
+
+    expect { CLI.start(['up', 'foo.domain.org', '--content', '2.2.2.2', '--ttl', '700']) }
+      .to output("UPDATE foo.domain.org A 2.2.2.2\nupdated\n").to_stdout
+    expect(record).to have_received(:content=).with('2.2.2.2')
+    expect(record).to have_received(:ttl=).with(700)
+    expect(record).to have_received(:save)
+  end
+
   it 'prints environment variables' do
     expect { CLI.start(['env']) }
       .to output("PORKBUN_API_KEY: YOUR_API_KEY\nPORKBUN_SECRET_API_KEY: YOUR_SECRET_API_KEY\n").to_stdout
