@@ -104,7 +104,7 @@ describe CLI do
     file.write("www.onepiece.com. 600 IN A 1.1.1.1\n")
     file.close
     record = Object.new
-    def record.inspect
+    def record.to_s
       'www.onepiece.com A 1.1.1.1'
     end
     allow(Porkbun::Domain).to receive(:import).and_return([record])
