@@ -5,6 +5,7 @@ This repository contains a Ruby gem and CLI for the Porkbun API. The project is 
 ## Rules
 
 - Read the relevant Ruby source and tests before changing behavior.
+- Implement behavior in the local library API (`lib/`), not in the CLI. Keep CLI commands as thin argument and output adapters.
 - Keep changes focused. Do not add speculative features or refactors.
 - Add or update RSpec coverage for behavior changes.
 - Run the test suite after every code modification and before every commit. Report the result.

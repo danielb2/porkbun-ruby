@@ -9,6 +9,7 @@ All notable changes to this project are documented here.
 - Added the `rm` CLI command for deleting one unambiguous record by hostname, with or without a trailing dot.
 - Added the `update` CLI command, with `up` as an alias, to change record content or TTL.
 - Replaced the public `Porkbun::DNS.retrieve` API with `Porkbun::DNS.list`.
+- Added library record helpers used by the CLI for hostname-based create, list, update, and delete operations.
 - Added RSpec coverage for `Porkbun::DNS.list`.
 - Updated Thor to `1.5.0`.
 - Fixed `--help` handling for CLI commands.
