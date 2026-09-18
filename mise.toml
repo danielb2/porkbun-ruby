@@ -1,0 +1,2 @@
+[tools]
+ruby = { version = "4.0.4", postinstall = "gem install pry amazing_print slop http sqlite3 thor colorize" }
