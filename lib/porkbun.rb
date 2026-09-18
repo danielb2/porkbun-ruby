@@ -91,6 +91,106 @@ module Porkbun
       end
     end
 
+    def self.domain_for(hostname)
+      fqdn = hostname.to_s.chomp('.')
+      domains = Porkbun::Domain.list_all[:domains].map { |item| item[:domain] }
+      domains.sort_by(&:length).reverse.find do |domain|
+        fqdn == domain || fqdn.end_with?(".#{domain}")
+      end
+    end
+
+    def self.records_for(target, id = nil)
+      requested = target.to_s.chomp('.')
+      owner = domain_for(requested) || requested.split('.').last(2).join('.')
+      records = list(owner, id)
+      raise records if records.is_a?(Error)
+      return records if owner == requested
+
+      records.select { |record| record_hostname(record, owner) == requested }
+    end
+
+    def self.find_record(hostname)
+      records = records_for(hostname)
+      raise Error, 'No record found for hostname' if records.empty?
+      raise Error, 'Multiple records found for hostname' if records.length > 1
+
+      records.first
+    end
+
+    def self.create_record(record, options)
+      fqdn = record.chomp('.')
+      domain = domain_for(fqdn) || fqdn.split('.').last(2).join('.')
+      name = fqdn == domain ? '' : fqdn.delete_suffix(".#{domain}")
+      create(options.merge(domain:, name:))
+    end
+
+    def self.update_record(record, options)
+      record.name = relative_record_name(record)
+      record.content = options[:content] if options[:content]
+      record.ttl = options[:ttl] if options[:ttl]
+      record.save
+      record
+    end
+
+    def self.delete_record(hostname)
+      record = find_record(hostname)
+      record.delete
+      record
+    end
+
+    def self.delete_all(domain, id = '')
+      list(domain, id).reject { |record| record.type == 'NS' }.each(&:delete)
+    end
+
+    def self.import_zone(file)
+      record_regex = /^(?<hostname>[^\s]+)\.\s+(?<ttl>\d+)\s+IN\s+(?<type>[^\s]+)\s*(?<priority>\d+)?\s+(?<content>.+)$/
+      IO.readlines(file).filter_map do |line|
+        match_data = line.match(record_regex)
+        next unless match_data
+
+        labels = match_data[:hostname].split('.')
+        options = {
+          domain: labels[-2..].join('.'),
+          name: labels[0..-3].join('.'),
+          ttl: match_data[:ttl],
+          type: match_data[:type],
+          prio: match_data[:priority],
+          content: match_data[:content].chomp('.').gsub(/^"|"$/, '')
+        }.compact
+        create(options)
+      end
+    end
+
+    def self.public_ip
+      Net::HTTP.get(URI('https://canhazip.com')).chomp
+    end
+
+    def self.update_dynamic(hostname, ip)
+      records = records_for(hostname)
+      return { created: true, record: create_record(hostname, type: 'A', content: ip) } if records.empty?
+
+      record = records.first
+      display = record.to_s
+      update_record(record, content: ip)
+      { created: false, display:, record: }
+    end
+
+    def self.record_hostname(record, domain)
+      name = record.name.to_s.chomp('.')
+      return domain if name.empty? || name == '@'
+
+      name.end_with?(".#{domain}") ? name : "#{name}.#{domain}"
+    end
+
+    def self.relative_record_name(record)
+      name = record.name.to_s.chomp('.')
+      domain = record.domain.to_s.chomp('.')
+      return '' if name == domain
+      return name.delete_suffix(".#{domain}") if name.end_with?(".#{domain}")
+
+      name
+    end
+
     def delete
       raise Error, 'Need ID to delete record' unless id
 

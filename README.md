@@ -44,6 +44,15 @@ options:
 
 returns instance of DNS which can be used to delete
 
+### Record helpers
+
+- `Porkbun::DNS.create_record(record, options)` - Create a record from a full hostname.
+- `Porkbun::DNS.records_for(record, id = nil)` - List records for a domain or hostname.
+- `Porkbun::DNS.find_record(record)` - Find one unambiguous record by hostname.
+- `Porkbun::DNS.update_record(record, options)` - Update content or TTL and save the record.
+- `Porkbun::DNS.delete_record(record)` - Delete one unambiguous record by hostname.
+- `Porkbun::DNS.delete_all(domain, id = '')` - Delete all non-NS records for a domain.
+
 ## CLI
 
 The gem also comes with a CLI
