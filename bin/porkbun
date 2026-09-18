@@ -14,7 +14,7 @@ class CLI < Thor
 
   desc 'import FILE', 'Import BIND zone file'
   def import(file)
-    Porkbun::Domain.import(file).each { |record| pp record }
+    Porkbun::Domain.import(file).each { |record| puts record }
   end
 
   desc 'ls [DOMAIN] [ID]', 'List all domains or records for a domain'
