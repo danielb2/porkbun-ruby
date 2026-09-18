@@ -80,9 +80,12 @@ class CLI < Thor
     raise Thor::Error, 'Specify --content or --ttl' unless options[:content] || options[:ttl]
 
     record = find_record(hostname)
+
+    display = record.to_s
+    record.name = relative_record_name(record)
     record.content = options[:content] if options[:content]
     record.ttl = options[:ttl] if options[:ttl]
-    puts "UPDATE #{record}"
+    puts "UPDATE #{display}"
     record.save
     puts record.message
   end
@@ -108,17 +111,36 @@ class CLI < Thor
 
     records.first
   end
+
+  def domain_for(hostname)
+    fqdn = hostname.chomp('.')
+    Porkbun::Domain.list_all[:domains]
+      .map { |item| item[:domain] }
+      .sort_by(&:length)
+      .reverse
+      .find { |item| fqdn == item || fqdn.end_with?(".#{item}") }
   end
 
-  desc 'add', 'Add a new record'
+  def relative_record_name(record)
+    name = record.name.to_s.chomp('.')
+    domain = record.domain.to_s.chomp('.')
+    return '' if name == domain
+    return name.delete_suffix(".#{domain}") if name.end_with?(".#{domain}")
+
+    name
+  end
+  end
+
+  desc 'add RECORD', 'Add a new record'
   option :type, required: true, desc: 'The record type: A, AAAA, CNAME, MX, TXT, SRV, NS, SOA'
-  option :domain, required: true, desc: 'The domain name: google.com'
-  option :name, required: true, desc: 'The hostname: www'
   option :content, required: true, desc: 'The content: hostname, or IP address'
   option :ttl, default: 600, type: :numeric, desc: 'The TTL in seconds'
   option :prio, default: 0, type: :numeric, desc: 'The priority for MX records'
-  def add
-    record = Porkbun::DNS.create(options)
+  def add(record)
+    fqdn = record.chomp('.')
+    domain = domain_for(fqdn) || fqdn.split('.').last(2).join('.')
+    name = fqdn == domain ? '' : fqdn.delete_suffix(".#{domain}")
+    record = Porkbun::DNS.create(options.merge(domain:, name:))
     puts record
     puts record.message
   end

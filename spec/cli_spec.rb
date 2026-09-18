@@ -35,17 +35,21 @@ describe CLI do
 
   it 'creates a record' do
     record = double(to_s: 'www.onepiece.com A 1.1.1.1', message: 'created')
+    allow(Porkbun::Domain).to receive(:list_all).and_return(domains: [{ domain: 'onepiece.com' }])
     allow(Porkbun::DNS).to receive(:create).and_return(record)
 
     expect {
-      CLI.start(['add', '--type', 'A', '--domain', 'onepiece.com', '--name', 'www', '--content', '1.1.1.1'])
+      CLI.start(['add', 'www.onepiece.com', '--type', 'A', '--content', '1.1.1.1'])
     }.to output("www.onepiece.com A 1.1.1.1\ncreated\n").to_stdout
-    expect(Porkbun::DNS).to have_received(:create).with(hash_including(domain: 'onepiece.com'))
+    expect(Porkbun::DNS).to have_received(:create).with(
+      hash_including(domain: 'onepiece.com', name: 'www', content: '1.1.1.1')
+    )
   end
 
   it 'updates record content and TTL' do
-    record = double(name: 'foo', content: '1.1.1.1', ttl: 600, to_s: 'foo.domain.org A 2.2.2.2', message: 'updated')
+    record = double(name: 'foo', domain: 'domain.org', content: '1.1.1.1', ttl: 600, to_s: 'foo.domain.org A 2.2.2.2', message: 'updated')
     allow(record).to receive(:content=)
+    allow(record).to receive(:name=)
     allow(record).to receive(:ttl=)
     allow(record).to receive(:save)
     allow(Porkbun::Domain).to receive(:list_all).and_return(domains: [{ domain: 'domain.org' }])
