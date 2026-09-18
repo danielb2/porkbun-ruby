@@ -5,7 +5,6 @@ require 'porkbun'
 require 'thor'
 
 class CLI < Thor
-  map 'ls' => 'list'
   remove_command :tree
 
   def self.basename
@@ -36,8 +35,8 @@ class CLI < Thor
     end
   end
 
-  desc 'list [DOMAIN] [ID]', 'List all domains or records for a domain (alias: ls)'
-  def list(domain = nil, id = '')
+  desc 'ls [DOMAIN] [ID]', 'List all domains or records for a domain'
+  def ls(domain = nil, id = '')
     if domain
       records = get_all(domain, id)
       puts records
@@ -55,8 +54,8 @@ class CLI < Thor
     puts 'PORKBUN_SECRET_API_KEY: ' + ENV['PORKBUN_SECRET_API_KEY'].to_s
   end
 
-  desc 'delete_all DOMAIN', 'deletes all records for a domain. this is destructive. use with caution'
-  def delete_all(domain, id = '')
+  desc 'rm_rf DOMAIN', 'deletes all records for a domain. this is destructive. use with caution'
+  def rm_rf(domain, id = '')
     records = get_all(domain, id)
     records.each do |record|
       next if record.type == 'NS'
@@ -66,14 +65,14 @@ class CLI < Thor
     end
   end
 
-  desc 'create', 'Create a new record'
+  desc 'add', 'Add a new record'
   option :type, required: true, desc: 'The record type: A, AAAA, CNAME, MX, TXT, SRV, NS, SOA'
   option :domain, required: true, desc: 'The domain name: google.com'
   option :name, required: true, desc: 'The hostname: www'
   option :content, required: true, desc: 'The content: hostname, or IP address'
   option :ttl, default: 600, type: :numeric, desc: 'The TTL in seconds'
   option :prio, default: 0, type: :numeric, desc: 'The priority for MX records'
-  def create
+  def add
     record = Porkbun::DNS.create(options)
     puts record
     puts record.message

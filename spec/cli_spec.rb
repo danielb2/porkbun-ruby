@@ -4,40 +4,33 @@ require 'thor'
 load File.expand_path('../bin/porkbun', __dir__)
 
 describe CLI do
-  describe '.list' do
+  describe '.ls' do
     it 'lists all domains' do
       allow(Porkbun::Domain).to receive(:list_all).and_return(
         domains: [{ domain: 'onepiece.com' }]
       )
 
-      expect { CLI.start(['list']) }.to output("onepiece.com\n").to_stdout
+      expect { CLI.start(['ls']) }.to output("onepiece.com\n").to_stdout
     end
 
     it 'lists records for a specific domain' do
       record = instance_double(Porkbun::DNS, to_s: 'www.onepiece.com A 1.1.1.1')
       allow(Porkbun::DNS).to receive(:list).with('onepiece.com', '').and_return([record])
 
-      expect { CLI.start(['list', 'onepiece.com']) }
+      expect { CLI.start(['ls', 'onepiece.com']) }
         .to output("www.onepiece.com A 1.1.1.1\n").to_stdout
     end
   end
 
-  it 'supports ls as an alias for list' do
-    allow(Porkbun::Domain).to receive(:list_all).and_return(domains: [])
 
-    expect { CLI.start(['ls']) }.not_to raise_error
-    expect(Porkbun::Domain).to have_received(:list_all)
+
+  it 'shows help for ls' do
+    expect { CLI.start(['help', 'ls']) }
+      .to output(/Usage:\n  porkbun ls/).to_stdout
   end
 
-
-  it 'shows help for list' do
-    expect { CLI.start(['help', 'list']) }
-      .to output(/Usage:\n  porkbun list/).to_stdout
-  end
-
-  it 'shows the ls alias in the list help' do
-    expect { CLI.start(['help']) }.to output(/porkbun list/).to_stdout
-    expect(CLI.all_commands['list'].description).to include('(alias: ls)')
+  it 'shows ls in the command help' do
+    expect { CLI.start(['help']) }.to output(/porkbun ls/).to_stdout
   end
 
   it 'creates a record' do
@@ -45,7 +38,7 @@ describe CLI do
     allow(Porkbun::DNS).to receive(:create).and_return(record)
 
     expect {
-      CLI.start(['create', '--type', 'A', '--domain', 'onepiece.com', '--name', 'www', '--content', '1.1.1.1'])
+      CLI.start(['add', '--type', 'A', '--domain', 'onepiece.com', '--name', 'www', '--content', '1.1.1.1'])
     }.to output("www.onepiece.com A 1.1.1.1\ncreated\n").to_stdout
     expect(Porkbun::DNS).to have_received(:create).with(hash_including(domain: 'onepiece.com'))
   end
@@ -61,7 +54,7 @@ describe CLI do
     allow(a_record).to receive(:delete)
     allow(Porkbun::DNS).to receive(:list).and_return([ns_record, a_record])
 
-    expect { CLI.start(['delete_all', 'onepiece.com']) }
+    expect { CLI.start(['rm_rf', 'onepiece.com']) }
       .to output("DELETE www.onepiece.com A 1.1.1.1\n").to_stdout
     expect(a_record).to have_received(:delete)
   end

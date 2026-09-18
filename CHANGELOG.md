@@ -4,8 +4,8 @@ All notable changes to this project are documented here.
 
 ## [2.0.0] - 2026-09-18
 
-- Added `ls` as an alias for the `list` CLI command.
-- Updated `list` to retrieve records when given a domain and optional record ID.
+- Added the `ls` CLI command for listing domains or retrieving records for a domain and optional record ID.
+- Renamed the CLI `create` command to `add` and `delete_all` to `rm_rf`.
 - Removed the `retrieve` CLI command.
 - Replaced the public `Porkbun::DNS.retrieve` API with `Porkbun::DNS.list`.
 - Added RSpec coverage for `Porkbun::DNS.list`.
