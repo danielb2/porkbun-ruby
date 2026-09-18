@@ -296,7 +296,9 @@ module Porkbun
     end
 
     def create_record(name, options)
-      Record.create_record(normalize_hostname(name), options)
+      hostname = normalize_hostname(name)
+      relative_name = hostname == domain ? '' : hostname.delete_suffix(".#{domain}")
+      Record.create(options.merge(domain:, name: relative_name))
     end
 
 
@@ -337,37 +339,17 @@ module Porkbun
     end
 
     class << self
-      def create(options)
-        Record.create(options)
-      end
-
-      def list(domain, id = nil)
-        Record.list(domain, id)
-      end
-
-      def records_for(target, id = nil)
-        Record.records_for(target, id)
-      end
-
-      def find_record(hostname)
+      def get_record(hostname)
         Record.find_record(hostname)
       end
+
+
+
 
       def create_record(hostname, options)
         Record.create_record(hostname, options)
       end
 
-      def update_record(record, options)
-        record.update(options)
-      end
-
-      def delete_record(hostname)
-        Record.delete_record(hostname)
-      end
-
-      def delete_all(domain, id = '')
-        Record.delete_all(domain, id)
-      end
 
       def import(file)
         Record.import_zone(file)

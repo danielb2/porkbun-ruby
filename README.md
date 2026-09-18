@@ -41,8 +41,6 @@ Make sure your keys are good.
 #### class methods
 
 - `all` - returns an array of `Porkbun::Domain` objects for each domain in the account.
-- `list(domain, id = nil)` - returns an array of `Porkbun::Record` objects from the DNS retrieve endpoint.
-- `create(options)` - returns a `Porkbun::Record` created from API fields.
 - `create_record(hostname, options)` - returns a `Porkbun::Record` created from a full hostname.
 - `get_record(hostname)` - returns one unambiguous `Porkbun::Record`.
 - `import(file)` - returns an array of `Porkbun::Record` objects created from a zone file.
@@ -90,7 +88,6 @@ record.update(ttl: 700)
 record.delete
 ```
 
-The lower-level `create` and `list` methods remain available for compatibility.
 
 ## CLI
 

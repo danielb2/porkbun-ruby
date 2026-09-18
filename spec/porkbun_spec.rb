@@ -66,8 +66,7 @@ describe Porkbun do
                      'Content-Type' => 'application/json'
                    })
 
-      record = Porkbun::Domain.create(name: 'www', content: '1.1.1.1', domain: 'onepiece.com',
-                                   type: 'A')
+      record = Porkbun.new('onepiece.com').create_record('www', type: 'A', content: '1.1.1.1')
       expect(record.id).to eq('106926659')
       expect(record).to be_a(Porkbun::Record)
     end
@@ -89,7 +88,7 @@ describe Porkbun do
                      'Content-Type' => 'application/json'
                    })
 
-      records = Porkbun::Domain.list('onepiece.com')
+      records = Porkbun.new('onepiece.com').records
       expect(records.first.domain).to eq('onepiece.com')
       expect(records.first.content).to eq('1.1.1.1')
       allow(Porkbun::Domain).to receive(:list_all).and_return(domains: [{ domain: 'onepiece.com' }])
