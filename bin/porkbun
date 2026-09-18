@@ -73,7 +73,7 @@ class CLI < Thor
     record.delete
   end
 
-  desc 'update RECORD', 'Update a record'
+  desc 'update RECORD', 'Update a record (alias: up)'
   option :content, desc: 'The new record content'
   option :ttl, type: :numeric, desc: 'The new TTL in seconds'
   def update(hostname)
