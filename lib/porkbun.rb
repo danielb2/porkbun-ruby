@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
-require 'http'
+require 'json'
+require 'net/http'
+require 'uri'
 require_relative 'porkbun/version'
 
 module Porkbun
@@ -10,10 +12,16 @@ module Porkbun
     if ENV.fetch('PORKBUN_API_KEY', nil).nil? || ENV.fetch('PORKBUN_SECRET_API_KEY', nil).nil?
       abort 'PORKBUN_API_KEY and PORKBUN_SECRET_API_KEY must be set'
     end
-    res = HTTP.post File.join('https://api.porkbun.com/api/json/v3', path), json: {
+    uri = URI(File.join('https://api.porkbun.com/api/json/v3', path))
+    request = Net::HTTP::Post.new(uri)
+    request['Content-Type'] = 'application/json'
+    request.body = {
       secretapikey: ENV.fetch('PORKBUN_SECRET_API_KEY', nil),
       apikey: ENV.fetch('PORKBUN_API_KEY', nil)
-    }.merge(options)
+    }.merge(options).to_json
+    res = Net::HTTP.start(uri.hostname, uri.port, use_ssl: uri.scheme == 'https') do |http|
+      http.request(request)
+    end
 
     JSON.parse(res.body, symbolize_names: true)
   end
