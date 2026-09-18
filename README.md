@@ -14,11 +14,18 @@ need a specific call to be implemented, let me know, or submit a PR
 ```ruby
 ENV['PORKBUN_API_KEY'] = 'YOUR_API_KEY'
 ENV['PORKBUN_SECRET_API_KEY'] = 'YOUR_SECRET_API_KEY'
-record = Porkbun::DNS.create(name: 'test',
+domain = Porkbun.new('domain.org')
+
+domain.records.each { |record| puts record.to_s }
+
+record = domain.create_record('test',
   type: 'A',
   content: '1.1.1.1',
   ttl: 300
 )
+record.update(content: '8.8.8.8')
+record.delete
+
 ```
 
 ## API
@@ -27,31 +34,63 @@ record = Porkbun::DNS.create(name: 'test',
 
 Make sure your keys are good.
 
-### `Porkbun::DNS.list(domain, id)`
+## Classes
 
-List all or a specific record for a domain
+### `Porkbun::Domain`
 
-### `Porkbun::DNS.create(options)`
+#### class methods
 
-Create record for a domain
+- `all` - returns an array of `Porkbun::Domain` objects for each domain in the account.
+- `list(domain, id = nil)` - returns an array of `Porkbun::Record` objects from the DNS retrieve endpoint.
+- `create(options)` - returns a `Porkbun::Record` created from API fields.
+- `create_record(hostname, options)` - returns a `Porkbun::Record` created from a full hostname.
+- `get_record(hostname)` - returns one unambiguous `Porkbun::Record`.
+- `import(file)` - returns an array of `Porkbun::Record` objects created from a zone file.
+- `update_dynamic(hostname, ip)` - returns a hash describing the created or updated record.
 
-options:
-- `name` - name of record. example `www`
-- `type` - record type. example: CNAME
-- `content` - content of record. example '1.1.1.1',
-- `ttl` - time to live. example: 600. porkbun seems to have this as a minimum
-- `prio` - record priority. mainly for MX records. example 10.
+```ruby
+Porkbun::Domain.all.each { |domain| puts domain }
+record = Porkbun::Domain.get_record('www.domain.org')
+record.update(content: '8.8.8.8')
+```
 
-returns instance of DNS which can be used to delete
+#### instance methods
 
-### Record helpers
+`Porkbun.new('domain.org')` returns a `Porkbun::Domain` object.
 
-- `Porkbun::DNS.create_record(record, options)` - Create a record from a full hostname.
-- `Porkbun::DNS.records_for(record, id = nil)` - List records for a domain or hostname.
-- `Porkbun::DNS.find_record(record)` - Find one unambiguous record by hostname.
-- `Porkbun::DNS.update_record(record, options)` - Update content or TTL and save the record.
-- `Porkbun::DNS.delete_record(record)` - Delete one unambiguous record by hostname.
-- `Porkbun::DNS.delete_all(domain, id = '')` - Delete all non-NS records for a domain.
+- `records` - returns an array of `Porkbun::Record` objects for the domain.
+- `get_record(name)` - returns one unambiguous `Porkbun::Record`; `name` can be relative or fully qualified.
+- `create_record(name, options)` - returns a new `Porkbun::Record`.
+- `delete_all_records` - returns an array of `Porkbun::Record` objects after deleting all non-NS records.
+- `zone_file` - returns a string that can be passed to `import`.
+
+```ruby
+domain = Porkbun.new('domain.org')
+record = domain.get_record('www')
+record.update(content: '8.8.8.8')
+record.delete
+
+domain.delete_all_records
+```
+
+### `Porkbun::Record`
+
+A `Porkbun::Record` represents one DNS record and owns its mutations.
+
+#### instance methods
+
+- `update(content:, ttl:)` - returns the updated `Porkbun::Record`.
+- `delete` - returns the deleted `Porkbun::Record`.
+- `to_s` - returns a string containing the BIND zone entry.
+
+```ruby
+record = domain.get_record('www')
+puts record.to_s
+record.update(ttl: 700)
+record.delete
+```
+
+The lower-level `create` and `list` methods remain available for compatibility.
 
 ## CLI
 

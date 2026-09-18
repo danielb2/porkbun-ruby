@@ -43,7 +43,7 @@ describe Porkbun do
       expect(Porkbun::Domain.list_all).to eq(body)
     end
   end
-  context Porkbun::DNS do
+  context Porkbun::Domain do
     it 'should create' do
       request_body =
         { 'secretapikey' => 'YOUR_SECRET_API_KEY',
@@ -66,9 +66,10 @@ describe Porkbun do
                      'Content-Type' => 'application/json'
                    })
 
-      record = Porkbun::DNS.create(name: 'www', content: '1.1.1.1', domain: 'onepiece.com',
+      record = Porkbun::Domain.create(name: 'www', content: '1.1.1.1', domain: 'onepiece.com',
                                    type: 'A')
       expect(record.id).to eq('106926659')
+      expect(record).to be_a(Porkbun::Record)
     end
 
     it 'should list records' do
@@ -88,9 +89,14 @@ describe Porkbun do
                      'Content-Type' => 'application/json'
                    })
 
-      records = Porkbun::DNS.list('onepiece.com')
+      records = Porkbun::Domain.list('onepiece.com')
       expect(records.first.domain).to eq('onepiece.com')
       expect(records.first.content).to eq('1.1.1.1')
+      allow(Porkbun::Domain).to receive(:list_all).and_return(domains: [{ domain: 'onepiece.com' }])
+
+      domain = Porkbun.new('onepiece.com')
+      expect(domain.records.first).to be_a(Porkbun::Record)
+      expect(domain.get_record('www')).to be_a(Porkbun::Record)
     end
   end
 end

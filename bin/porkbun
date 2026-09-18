@@ -14,16 +14,16 @@ class CLI < Thor
 
   desc 'import FILE', 'Import BIND zone file'
   def import(file)
-    Porkbun::DNS.import_zone(file).each { |record| pp record }
+    Porkbun::Domain.import(file).each { |record| pp record }
   end
 
   desc 'ls [DOMAIN] [ID]', 'List all domains or records for a domain'
   def ls(domain = nil, id = '')
     if domain
-      puts Porkbun::DNS.records_for(domain, id)
+      puts Porkbun.new(domain).records
     else
-      Porkbun::Domain.list_all[:domains].each do |domain|
-        puts domain[:domain]
+      Porkbun::Domain.all.each do |domain|
+        puts domain
       end
     end
   end
@@ -37,14 +37,15 @@ class CLI < Thor
 
   desc 'rm_rf DOMAIN', 'deletes all records for a domain. this is destructive. use with caution'
   def rm_rf(domain, id = '')
-    Porkbun::DNS.delete_all(domain, id).each do |record|
+    Porkbun.new(domain).delete_all_records.each do |record|
       puts "DELETE #{record}"
     end
   end
 
   desc 'rm RECORD', 'Delete one record for a hostname'
   def rm(hostname)
-    record = Porkbun::DNS.delete_record(hostname)
+    record = Porkbun::Domain.get_record(hostname)
+    record.delete
     puts "DELETE #{record}"
   end
 
@@ -54,9 +55,9 @@ class CLI < Thor
   def update(hostname)
     raise Thor::Error, 'Specify --content or --ttl' unless options[:content] || options[:ttl]
 
-    record = Porkbun::DNS.find_record(hostname)
+    record = Porkbun::Domain.get_record(hostname)
     puts "UPDATE #{record}"
-    Porkbun::DNS.update_record(record, options)
+    record.update(options)
     puts record.message
   end
 
@@ -66,8 +67,8 @@ class CLI < Thor
   option :content, required: true, desc: 'The content: hostname, or IP address'
   option :ttl, default: 600, type: :numeric, desc: 'The TTL in seconds'
   option :prio, default: 0, type: :numeric, desc: 'The priority for MX records'
-  def add(record)
-    record = Porkbun::DNS.create_record(record, options)
+  def add(hostname)
+    record = Porkbun::Domain.create_record(hostname, options)
     puts record
     puts record.message
   end
@@ -75,8 +76,8 @@ class CLI < Thor
   desc 'dyndns HOSTNAME [IP]', 'Update a dynamic dns record. example: porkbun dyndns home.example.com'
   long_desc 'If no IP is provided, the current public IP is used.'
   def dyndns(hostname, ip = nil)
-    ip ||= Porkbun::DNS.public_ip
-    result = Porkbun::DNS.update_dynamic(hostname, ip)
+    ip ||= Porkbun::Domain.public_ip
+    result = Porkbun::Domain.update_dynamic(hostname, ip)
     if result[:created]
       print 'CREATE '
       puts result[:record]

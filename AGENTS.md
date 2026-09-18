@@ -9,7 +9,7 @@ This repository contains a Ruby gem and CLI for the Porkbun API. The project is 
 - Keep changes focused. Do not add speculative features or refactors.
 - Add or update RSpec coverage for behavior changes.
 - Run the test suite after every code modification and before every commit. Report the result.
-- Keep `README.md` and `CHANGELOG.md` in sync with every user-facing change. Update `README.md` when commands, APIs, or usage change. Create a changelog entry when the project has a changelog.
+- Update `README.md` every time you change code. Keep it in sync with the current API, CLI, and usage after every code modification; do not defer documentation updates. Update `CHANGELOG.md` with every user-facing change.
 - Before bumping any dependency or project version, actually check the current latest release in an authoritative package registry. Do not rely on memory, an old lockfile, or an assumed version.
 - Treat API and CLI renames as breaking changes. Update the major version when they remove or rename public behavior.
 - Absolutely never commit, push, or change shared Git state unless the user explicitly instructs you to do so.

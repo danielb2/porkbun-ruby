@@ -8,9 +8,10 @@ All notable changes to this project are documented here.
 - Renamed the CLI `create` command to `add` and `delete_all` to `rm_rf`.
 - Added the `rm` CLI command for deleting one unambiguous record by hostname, with or without a trailing dot.
 - Added the `update` CLI command, with `up` as an alias, to change record content or TTL.
-- Replaced the public `Porkbun::DNS.retrieve` API with `Porkbun::DNS.list`.
-- Added library record helpers used by the CLI for hostname-based create, list, update, and delete operations.
-- Added RSpec coverage for `Porkbun::DNS.list`.
+- Replaced the public `Porkbun::DNS.retrieve` API with `Porkbun::Domain.list`.
+- Added `Porkbun.new(domain)` domain objects and `Porkbun::Record` objects for record retrieval, creation, update, and deletion.
+- Added `Porkbun::Domain#zone_file`, `Porkbun::Domain.import`, and explicit `get_record` naming.
+- Added RSpec coverage for `Porkbun::Domain.list`.
 - Updated Thor to `1.5.0`.
 - Fixed `--help` handling for CLI commands.
 - Added project guidance in `AGENTS.md` and `CLAUDE.md`.

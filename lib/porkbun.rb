@@ -49,7 +49,11 @@ module Porkbun
     porkbun 'ping'
   end
 
-  class DNS < Abstract
+  def self.new(domain)
+    Domain.new(domain)
+  end
+
+  class Record < Abstract
     attr_accessor :name, :content, :type, :ttl, :prio, :domain, :id, :notes
 
     def initialize(options)
@@ -63,7 +67,7 @@ module Porkbun
     end
 
     def self.create(options)
-      record = DNS.new options
+      record = Record.new options
       record.create
     end
 
@@ -80,6 +84,13 @@ module Porkbun
       edit
     end
 
+    def update(options = {})
+      self.name = Record.relative_record_name(self)
+      self.content = options[:content] if options.key?(:content)
+      self.ttl = options[:ttl] if options.key?(:ttl)
+      save
+    end
+
     def self.list(domain, id = nil)
       raise Error, 'need domain' unless domain
 
@@ -87,7 +98,7 @@ module Porkbun
       return Error.new(res[:message]) if res[:status] == 'ERROR'
 
       res[:records].map do |record|
-        DNS.new record.merge(domain:)
+        Record.new record.merge(domain:)
       end
     end
 
@@ -213,6 +224,7 @@ module Porkbun
       "#{name}. #{ttl} IN #{type} #{prio_str} #{content_str}".tr_s(' ', ' ')
     end
 
+
     def to_h
       {
         name: name,
@@ -243,6 +255,131 @@ module Porkbun
       }
       options.merge!(prio:) if prio and prio != '0'
       options
+    end
+  end
+
+
+  class Domain
+    attr_reader :domain
+
+    def initialize(domain)
+      @domain = domain.to_s.chomp('.')
+    end
+
+    def self.all
+      list_all[:domains].map { |item| new(item[:domain]) }
+    end
+
+    def to_s
+      domain
+    end
+
+    def records
+      Record.list(domain)
+    end
+
+    def records_for(target)
+      requested = normalize_hostname(target)
+      records = Record.list(domain)
+      raise records if records.is_a?(Error)
+      return records if requested == domain
+
+      records.select { |record| Record.record_hostname(record, domain) == requested }
+    end
+
+    def get_record(name)
+      matches = records_for(name)
+      raise Error, 'No record found for hostname' if matches.empty?
+      raise Error, 'Multiple records found for hostname' if matches.length > 1
+
+      matches.first
+    end
+
+    def create_record(name, options)
+      Record.create_record(normalize_hostname(name), options)
+    end
+
+
+    def delete_all_records
+      Record.delete_all(domain)
+    end
+
+    def zone_file
+      records.map(&:to_s).join("\n") + "\n"
+    end
+
+    def self.get_record(hostname)
+      Record.find_record(hostname)
+    end
+
+
+    def self.update_dynamic(hostname, ip)
+      Record.update_dynamic(hostname, ip)
+    end
+
+    def update_dynamic(name, ip)
+      matches = records_for(name)
+      return { created: true, record: create_record(name, type: 'A', content: ip) } if matches.empty?
+
+      record = get_record(name)
+      display = record.to_s
+      record.update(content: ip)
+      { created: false, display:, record: }
+    end
+
+    private
+
+    def normalize_hostname(name)
+      hostname = name.to_s.chomp('.')
+      return hostname if hostname == domain || hostname.end_with?(".#{domain}")
+
+      "#{hostname}.#{domain}"
+    end
+
+    class << self
+      def create(options)
+        Record.create(options)
+      end
+
+      def list(domain, id = nil)
+        Record.list(domain, id)
+      end
+
+      def records_for(target, id = nil)
+        Record.records_for(target, id)
+      end
+
+      def find_record(hostname)
+        Record.find_record(hostname)
+      end
+
+      def create_record(hostname, options)
+        Record.create_record(hostname, options)
+      end
+
+      def update_record(record, options)
+        record.update(options)
+      end
+
+      def delete_record(hostname)
+        Record.delete_record(hostname)
+      end
+
+      def delete_all(domain, id = '')
+        Record.delete_all(domain, id)
+      end
+
+      def import(file)
+        Record.import_zone(file)
+      end
+
+      def public_ip
+        Record.public_ip
+      end
+
+      def update_dynamic(hostname, ip)
+        Record.update_dynamic(hostname, ip)
+      end
     end
   end
 end
