@@ -70,5 +70,27 @@ describe Porkbun do
                                    type: 'A')
       expect(record.id).to eq('106926659')
     end
+
+    it 'should list records' do
+      response_body = {
+        status: 'SUCCESS',
+        records: [
+          { name: 'www', type: 'A', content: '1.1.1.1', ttl: 600, prio: '0', id: '106926659' }
+        ]
+      }
+
+      stub_request(:post, 'https://api.porkbun.com/api/json/v3/dns/retrieve/onepiece.com')
+        .with(body: {
+                "secretapikey": 'YOUR_SECRET_API_KEY',
+                "apikey": 'YOUR_API_KEY'
+              })
+        .to_return(status: 200, body: response_body.to_json, headers: {
+                     'Content-Type' => 'application/json'
+                   })
+
+      records = Porkbun::DNS.list('onepiece.com')
+      expect(records.first.domain).to eq('onepiece.com')
+      expect(records.first.content).to eq('1.1.1.1')
+    end
   end
 end

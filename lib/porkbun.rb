@@ -72,7 +72,7 @@ module Porkbun
       edit
     end
 
-    def self.retrieve(domain, id = nil)
+    def self.list(domain, id = nil)
       raise Error, 'need domain' unless domain
 
       res = Porkbun.porkbun File.join('dns/retrieve', domain, id || '').chomp('/')

@@ -5,6 +5,8 @@ require 'porkbun'
 require 'thor'
 
 class CLI < Thor
+  map 'ls' => 'list'
+
   desc 'import <file>', 'Import BIND zone file'
   def import(file)
     record_regex = /^(?<hostname>[^\s]+)\.\s+(?<ttl>\d+)\s+IN\s+(?<type>[^\s]+)\s*(?<priority>\d+)?\s+(?<content>.+)$/
@@ -29,10 +31,15 @@ class CLI < Thor
     end
   end
 
-  desc 'list', 'List all domains'
-  def list
-    Porkbun::Domain.list_all[:domains].each do |domain|
-      puts domain[:domain]
+  desc 'list [<domain>] [<id>]', 'List all domains or records for a domain'
+  def list(domain = nil, id = '')
+    if domain
+      records = get_all(domain, id)
+      puts records
+    else
+      Porkbun::Domain.list_all[:domains].each do |domain|
+        puts domain[:domain]
+      end
     end
   end
 
@@ -88,11 +95,6 @@ class CLI < Thor
     end
   end
 
-  desc 'retrieve <domain> [<id>]', 'List all records for a domain'
-  def retrieve(domain, id = '')
-    records = get_all(domain, id)
-    puts records
-  end
 
   def self.exit_on_failure?
     exit 1
@@ -101,7 +103,7 @@ class CLI < Thor
   private
 
   def get_all(domain, id = '')
-    records = Porkbun::DNS.retrieve(domain, id)
+    records = Porkbun::DNS.list(domain, id)
     if records.instance_of?(Porkbun::Error)
       puts records.message
       exit 1
@@ -110,4 +112,9 @@ class CLI < Thor
   end
 end
 
-CLI.start(ARGV)
+if ARGV.include?('--help')
+  command = ARGV.find { |arg| !arg.start_with?('-') }
+  CLI.start(command ? ['help', command] : ['help'])
+else
+  CLI.start(ARGV)
+end

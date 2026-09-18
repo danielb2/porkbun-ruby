@@ -27,9 +27,9 @@ record = Porkbun::DNS.create(name: 'test',
 
 Make sure your keys are good.
 
-### `Porkbun::DNS.retrieve(domain, id)`
+### `Porkbun::DNS.list(domain, id)`
 
-Retrive all or specific record for a domain
+List all or a specific record for a domain
 
 ### `Porkbun::DNS.create(options)`
 
@@ -54,8 +54,8 @@ The gem also comes with a CLI
       porkbun dyndns <hostname.domain> [<ip>]  # Update a dynamic dns record. example: porkbun dyndns home.example.com
       porkbun help [COMMAND]                   # Describe available commands or one specific command
       porkbun import <file>                    # Import BIND zone file
-      porkbun list                             # List all domains
-      porkbun retrieve <domain> [<id>]         # List all records for a domain
+      porkbun list [<domain>] [<id>]           # List all domains or records for a domain
+      porkbun ls [<domain>] [<id>]             # Alias for list
 
 
 be sure to set the environmental variables for it to work
