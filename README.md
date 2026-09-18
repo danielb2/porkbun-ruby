@@ -52,7 +52,7 @@ The gem also comes with a CLI
     Commands:
       porkbun add --content=CONTENT --domain=DOMAIN --name=NAME --type=TYPE     # Add a new record
       porkbun rm_rf DOMAIN                                                      # deletes all records for a domain. this is destructive. use with caution
-      porkbun rm HOSTNAME                                                      # Delete all records for a hostname
+      porkbun rm RECORD                                                       # Delete one record for a hostname
       porkbun dyndns HOSTNAME [IP]                                              # Update a dynamic dns record. example: porkbun dyndns home.example.com
       porkbun env                                                               # Print environment variables
       porkbun help [COMMAND]                                                    # Describe available commands or one specific command

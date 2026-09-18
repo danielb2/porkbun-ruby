@@ -4,9 +4,9 @@ All notable changes to this project are documented here.
 
 ## [2.0.0] - 2026-09-18
 
-- Added the `ls` CLI command for listing domains or retrieving records for a domain and optional record ID.
+- Removed the CLI `list` and `retrieve` commands and replaced them with the single `ls` command for listing domains or retrieving records for a domain and optional record ID.
 - Renamed the CLI `create` command to `add` and `delete_all` to `rm_rf`.
-- Removed the `retrieve` CLI command.
+- Added the `rm` CLI command for deleting one unambiguous record by hostname, with or without a trailing dot.
 - Replaced the public `Porkbun::DNS.retrieve` API with `Porkbun::DNS.list`.
 - Added RSpec coverage for `Porkbun::DNS.list`.
 - Updated Thor to `1.5.0`.

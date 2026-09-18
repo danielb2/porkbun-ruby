@@ -65,7 +65,7 @@ class CLI < Thor
     end
   end
 
-  desc 'rm HOSTNAME', 'Delete all records for a hostname'
+  desc 'rm RECORD', 'Delete one record for a hostname'
   def rm(hostname)
     fqdn = hostname.chomp('.')
     domain = Porkbun::Domain.list_all[:domains]
@@ -75,14 +75,17 @@ class CLI < Thor
       .find { |item| fqdn == item || fqdn.end_with?(".#{item}") }
     raise Porkbun::Error, 'Could not determine domain' unless domain
 
-    get_all(domain).select do |record|
+    records = get_all(domain).select do |record|
       name = record.name.to_s.chomp('.')
       record_hostname = name.empty? || name == '@' ? domain : name.end_with?(".#{domain}") ? name : "#{name}.#{domain}"
       record_hostname == fqdn
-    end.each do |record|
-      puts "DELETE #{record}"
-      record.delete
     end
+    raise Porkbun::Error, 'No record found for hostname' if records.empty?
+    raise Porkbun::Error, 'Multiple records found for hostname' if records.length > 1
+
+    record = records.first
+    puts "DELETE #{record}"
+    record.delete
   end
 
   desc 'add', 'Add a new record'
