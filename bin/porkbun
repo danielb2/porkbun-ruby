@@ -5,6 +5,7 @@ require 'porkbun'
 require 'thor'
 
 class CLI < Thor
+  map 'ls' => 'list'
   remove_command :tree
 
   def self.basename
@@ -35,7 +36,7 @@ class CLI < Thor
     end
   end
 
-  desc 'list [DOMAIN] [ID]', 'List all domains or records for a domain'
+  desc 'list [DOMAIN] [ID]', 'List all domains or records for a domain (alias: ls)'
   def list(domain = nil, id = '')
     if domain
       records = get_all(domain, id)
@@ -47,15 +48,11 @@ class CLI < Thor
     end
   end
 
-  desc 'ls [DOMAIN] [ID]', 'Alias for list'
-  def ls(domain = nil, id = '')
-    list(domain, id)
-  end
 
   desc 'env', 'Print environment variables'
   def env
     puts 'PORKBUN_API_KEY: ' + ENV['PORKBUN_API_KEY'].to_s
-    puts 'BUN_SECRET_API_KEY: ' + ENV['PORKBUN_SECRET_API_KEY'].to_s
+    puts 'PORKBUN_SECRET_API_KEY: ' + ENV['PORKBUN_SECRET_API_KEY'].to_s
   end
 
   desc 'delete_all DOMAIN', 'deletes all records for a domain. this is destructive. use with caution'
