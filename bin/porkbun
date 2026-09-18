@@ -5,9 +5,13 @@ require 'porkbun'
 require 'thor'
 
 class CLI < Thor
-  map 'ls' => 'list'
+  remove_command :tree
 
-  desc 'import <file>', 'Import BIND zone file'
+  def self.basename
+    'porkbun'
+  end
+
+  desc 'import FILE', 'Import BIND zone file'
   def import(file)
     record_regex = /^(?<hostname>[^\s]+)\.\s+(?<ttl>\d+)\s+IN\s+(?<type>[^\s]+)\s*(?<priority>\d+)?\s+(?<content>.+)$/
     IO.readlines(file).each do |line|
@@ -31,7 +35,7 @@ class CLI < Thor
     end
   end
 
-  desc 'list [<domain>] [<id>]', 'List all domains or records for a domain'
+  desc 'list [DOMAIN] [ID]', 'List all domains or records for a domain'
   def list(domain = nil, id = '')
     if domain
       records = get_all(domain, id)
@@ -43,13 +47,18 @@ class CLI < Thor
     end
   end
 
+  desc 'ls [DOMAIN] [ID]', 'Alias for list'
+  def ls(domain = nil, id = '')
+    list(domain, id)
+  end
+
   desc 'env', 'Print environment variables'
   def env
     puts 'PORKBUN_API_KEY: ' + ENV['PORKBUN_API_KEY'].to_s
     puts 'BUN_SECRET_API_KEY: ' + ENV['PORKBUN_SECRET_API_KEY'].to_s
   end
 
-  desc 'delete_all <domain>', 'deletes all records for a domain. this is destructive. use with caution'
+  desc 'delete_all DOMAIN', 'deletes all records for a domain. this is destructive. use with caution'
   def delete_all(domain, id = '')
     records = get_all(domain, id)
     records.each do |record|
@@ -73,7 +82,7 @@ class CLI < Thor
     puts record.message
   end
 
-  desc 'dyndns <hostname.domain> [<ip>]', 'Update a dynamic dns record. example: porkbun dyndns home.example.com'
+  desc 'dyndns HOSTNAME [IP]', 'Update a dynamic dns record. example: porkbun dyndns home.example.com'
   long_desc 'If no IP is provided, the current public IP is used.'
   def dyndns(hostname, ip = nil)
     ip ||= Net::HTTP.get(URI('https://canhazip.com')).chomp
@@ -112,9 +121,11 @@ class CLI < Thor
   end
 end
 
-if ARGV.include?('--help')
-  command = ARGV.find { |arg| !arg.start_with?('-') }
-  CLI.start(command ? ['help', command] : ['help'])
-else
-  CLI.start(ARGV)
+if $PROGRAM_NAME == __FILE__
+  if ARGV.include?('--help')
+    command = ARGV.find { |arg| !arg.start_with?('-') }
+    CLI.start(command ? ['help', command] : ['help'])
+  else
+    CLI.start(ARGV)
+  end
 end

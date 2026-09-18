@@ -11,7 +11,7 @@ This repository contains a Ruby gem and CLI for the Porkbun API. The project is 
 - Keep `README.md` and `CHANGELOG.md` in sync with user-facing changes. Create a changelog entry when the project has a changelog.
 - Before bumping any dependency or project version, actually check the current latest release in an authoritative package registry. Do not rely on memory, an old lockfile, or an assumed version.
 - Treat API and CLI renames as breaking changes. Update the major version when they remove or rename public behavior.
-- Never commit, push, or change shared Git state unless explicitly requested.
+- Absolutely never commit, push, or change shared Git state unless the user explicitly instructs you to do so.
 
 ## Structure
 
